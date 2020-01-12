@@ -1,0 +1,32 @@
+[Unit]
+Description=Wordpress Server
+Documentation=https://jenkins.io/doc/
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=jenkins
+Group=jenkins
+TimeoutStartSec=0
+Restart=on-failure
+RestartSec=30s
+ExecStartPre=-/usr/bin/docker kill wordpress-server
+ExecStartPre=-/usr/bin/docker rm wordpress-server
+ExecStartPre=/usr/bin/docker pull wordpress:latest
+ExecStart=/usr/bin/docker run \
+    --name wordpress-server --rm \
+    -u root:999 \
+    --publish 8081:80 \
+    --volume /var/wordpress:/var/jenkins_home \
+    --volume /var/wordpress_backup:/var/wordpress_backup \
+    --link mysql-server:mysql-server \
+    --env="WORDPRESS_DB_HOST=mysql-server" \
+    --env="WORDPRESS_DB_USER=wordpress" \
+    --env="WORDPRESS_DB_PASSWORD=testing123!" \
+    wordpress:latest
+SyslogIdentifier=wordpress-server
+ExecStop=/usr/bin/docker stop wordpress-server
+
+[Install]
+WantedBy=multi-user.target

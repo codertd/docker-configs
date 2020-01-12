@@ -1,0 +1,29 @@
+[Unit]
+Description=Mysql Server
+Documentation=https://jenkins.io/doc/
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=tdoyle
+Group=tdoyle
+TimeoutStartSec=0
+Restart=on-failure
+RestartSec=30s
+ExecStartPre=-/usr/bin/docker kill mysql-server
+ExecStartPre=-/usr/bin/docker rm mysql-server
+ExecStartPre=/usr/bin/docker pull mariadb/server:latest
+ExecStart=/usr/bin/docker run \
+    --name mysql-server --rm \
+    -u root:999 \
+    --publish 3306:3306 \
+    --volume /var/mysql:/var/lib/mysql \
+    --volume /var/mysql_backup:/var/mysql_backup \
+    --env="MYSQL_ROOT_PASSWORD=startuppasswd" \
+    mariadb/server:latest
+SyslogIdentifier=mysql-server
+ExecStop=/usr/bin/docker stop mysql-server
+
+[Install]
+WantedBy=multi-user.target
