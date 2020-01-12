@@ -3,6 +3,7 @@ Description=Wordpress Server
 Documentation=https://jenkins.io/doc/
 After=docker.service
 Requires=docker.service
+Requires=mysql-docker.service
 
 [Service]
 Type=simple
@@ -18,8 +19,7 @@ ExecStart=/usr/bin/docker run \
     --name wordpress-server --rm \
     -u root:999 \
     --publish 8081:80 \
-    --volume /var/wordpress:/var/jenkins_home \
-    --volume /var/wordpress_backup:/var/wordpress_backup \
+    --volume /var/wordpress:/var/www/html \
     --link mysql-server:mysql-server \
     --env="WORDPRESS_DB_HOST=mysql-server" \
     --env="WORDPRESS_DB_USER=wordpress" \

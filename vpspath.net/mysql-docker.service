@@ -1,3 +1,5 @@
+# wordpress db env variables are here to allow ease of backup.
+
 [Unit]
 Description=Mysql Server
 Documentation=https://jenkins.io/doc/
@@ -21,6 +23,8 @@ ExecStart=/usr/bin/docker run \
     --volume /var/mysql:/var/lib/mysql \
     --volume /var/mysql_backup:/var/mysql_backup \
     --env="MYSQL_ROOT_PASSWORD=startuppasswd" \
+    --env="WORDPRESS_DB_USER=wordpress" \
+    --env="WORDPRESS_DB_PASSWORD=testing123!" \
     mariadb/server:latest
 SyslogIdentifier=mysql-server
 ExecStop=/usr/bin/docker stop mysql-server
