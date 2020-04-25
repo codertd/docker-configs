@@ -1,0 +1,32 @@
+# Open Project docker service
+
+[Unit]
+Description=OpenProject Server
+Documentation=https://docs.openproject.org/
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=jenkins
+Group=jenkins
+TimeoutStartSec=0
+Restart=on-failure
+RestartSec=30s
+ExecStartPre=-/usr/bin/docker kill openproj-server
+ExecStartPre=-/usr/bin/docker rm openproj-server
+ExecStartPre=/usr/bin/docker pull openproject/community:10
+ExecStart=/usr/bin/docker run \
+    --name openproj-server --rm \
+    -u root:999 \
+    --publish 8084:80 \
+    --env="SECRET_KEY_BASE=Myp455123!!!xyz" \
+    --volume /var/openproject/pgdata:/var/openproject/pgdata \
+    --volume /var/openproject/static:/var/openproject/assets \
+    openproject/community:10
+
+SyslogIdentifier=openproj-server
+ExecStop=/usr/bin/docker stop openproj-server
+
+[Install]
+WantedBy=multi-user.target
